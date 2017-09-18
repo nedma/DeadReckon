@@ -31,6 +31,7 @@ GameObject:
   - 23: {fileID: 2354434}
   - 114: {fileID: 11454432}
   - 54: {fileID: 5454432}
+  - 114: {fileID: 11450686}
   m_Layer: 8
   m_Name: Replica
   m_TagString: Untagged
@@ -75,7 +76,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: 76ed22e9ff64390448e2197699ecfbb8, type: 2}
+  - {fileID: 0}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -95,7 +96,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: e3c7339c484fba145b1fac66d1ae1fe2, type: 2}
+  - {fileID: 2100000, guid: 458aa19626a0c454a8915e289cea9f80, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -144,6 +145,21 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11450686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 154434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a40baba0443fc43840efc81d1fac05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BaseSphereRadius: .159999996
+  RecordMaxFrame: 80
+  ShowPrediction: 1
+  ShowPath: 1
 --- !u!114 &11454432
 MonoBehaviour:
   m_ObjectHideFlags: 1
