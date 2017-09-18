@@ -71,7 +71,7 @@ public class DRComponent : MonoBehaviour
 
     public void SetLastKnownAngularVelocity(Vector3 vec)
     {
-        helper.mAngularVelocityVector = vec;
+        helper.SetLastKnownAngularVelocity(vec);
         mUpdated = true;
     }
 

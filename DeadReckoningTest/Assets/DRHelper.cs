@@ -58,7 +58,7 @@ public class DRHelper
     bool mUpdated = false;
 
 
-    public Vector3 mAngularVelocityVector;
+    Vector3 mAngularVelocityVector;
     bool mRotationInitiated = false;
     bool mRotationUpdated = false;
     // if the rotation has been resolved to the last updated version.
@@ -210,6 +210,12 @@ public class DRHelper
     public void SetLastKnownAcceleration(Vector3 vec)
     {
         mAcceleration = vec;
+        mUpdated = true;
+    }
+
+    public void SetLastKnownAngularVelocity(Vector3 angVel)
+    {
+        mAngularVelocityVector = angVel;
         mUpdated = true;
     }
 
