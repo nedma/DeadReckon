@@ -10,6 +10,12 @@ public struct XTransform
 
 public class DRComponent : MonoBehaviour 
 {
+    Recorder m_Recorder;
+    public Recorder Recorder
+    {
+        get { return m_Recorder; }
+    }
+
     DRHelper helper = new DRHelper();
     bool mUpdated = false;
 
@@ -26,6 +32,8 @@ public class DRComponent : MonoBehaviour
 	void Start () 
     {
         helper.Init(this);
+
+        m_Recorder = GetComponent<Recorder>();
 	}
 	
 	// Update is called once per frame
@@ -40,6 +48,8 @@ public class DRComponent : MonoBehaviour
     {
         helper.SetLastKnownTranslation(pos);
         mUpdated = true;
+
+        m_Recorder.SetSnapshot(pos);
     }
 //     public void SetLastKnownRotation(Vector3 pos)
 //     {
@@ -116,12 +126,16 @@ public class DRComponent : MonoBehaviour
                  Vector3 deltaMove = xform.Pos - rigidbody.position;
                  float t = Mathf.Max(Time.deltaTime, 0.01f);
                  rigidbody.velocity = deltaMove / t;
+
+                 m_Recorder.SetPath(xform.Pos);
              }      
              else
              {
                  transform.position = xform.Pos;
                  if (bClampToGround)
                      ClampToGround();
+
+                 m_Recorder.SetPath(transform.position);
              }
          }
 

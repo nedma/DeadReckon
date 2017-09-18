@@ -174,6 +174,8 @@ public class DRHelper
                 accelerationEffect = (mAcceleration * 0.5f) * (mElapsedTimeSinceUpdate * mElapsedTimeSinceUpdate);
             }
             pos = mLastValue + mLastVelocity * mElapsedTimeSinceUpdate + accelerationEffect;
+
+            m_Owner.Recorder.SetPrediction(pos);
         }
         else
         {
@@ -220,6 +222,9 @@ public class DRHelper
         {
             pos += ((mAcceleration * 0.5f) * (mElapsedTimeSinceUpdate * mElapsedTimeSinceUpdate));
         }
+
+
+        m_Owner.Recorder.SetPrediction(velBlendedPos);
 
         return pos;
     }

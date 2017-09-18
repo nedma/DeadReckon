@@ -132,7 +132,7 @@ public class DRPublishingComponent : MonoBehaviour
     {
         //ComputeCurrentVelocity();
 
-
+        //Debug.LogWarning("fixed update, deltaTime=" + Time.fixedDeltaTime);
     }
 
     void ComputeCurrentVelocity()
@@ -143,6 +143,8 @@ public class DRPublishingComponent : MonoBehaviour
 
 
         mAccumulatedLinearVelocity = rigidbody.velocity;
+
+        //Debug.LogWarning("mCurrentAcceleration= " + mCurrentAcceleration + ", deltaTime=" + Time.deltaTime + ", time=" + Time.time);
     }
 
     void ComputeCurrentVelocity_Deprecated(float deltaTime, Vector3 pos)
