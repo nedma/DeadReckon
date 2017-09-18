@@ -82,7 +82,7 @@ public class DRComponent : MonoBehaviour
 
         if (helper.IsUpdated())
         {
-            helper.SetLastTranslationUpdatedTime(Time.time);
+            //helper.SetLastTranslationUpdatedTime(Time.time);
             helper.SetTranslationElapsedTimeSinceUpdate(0.0f);
         }
 
@@ -137,6 +137,10 @@ public class DRComponent : MonoBehaviour
 
                  m_Recorder.SetPath(transform.position);
              }
+         }
+         else
+         {
+             m_Recorder.SetPath(transform.position);
          }
 
          // Clear the updated flag.

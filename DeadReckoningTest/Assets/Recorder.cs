@@ -9,10 +9,13 @@ public class Recorder : MonoBehaviour
         public Vector3 Pos;
         public int FrameCount;
 
-        public Record(Vector3 inPos, int inFrameCount)
+        public int Flag;
+
+        public Record(Vector3 inPos, int inFrameCount, int inFlag)
         {
             Pos = inPos;
             FrameCount = inFrameCount;
+            Flag = inFlag;
         }
     }
 
@@ -37,6 +40,8 @@ public class Recorder : MonoBehaviour
         }
     }
 
+    int m_Flag = 0;
+
 
     List<Record> m_SnapshotRecord = new List<Record>();
     List<Record> m_PredictionRecord = new List<Record>();
@@ -52,7 +57,11 @@ public class Recorder : MonoBehaviour
             }
         }
 
-        m_SnapshotRecord.Add(new Record(pos, Time.frameCount));
+
+        m_Flag = (++m_Flag) % 2;
+
+        m_SnapshotRecord.Add(new Record(pos, Time.frameCount, m_Flag));
+
     }
 
     public void SetPrediction(Vector3 pos)
@@ -65,7 +74,7 @@ public class Recorder : MonoBehaviour
             }
         }
 
-        m_PredictionRecord.Add(new Record(pos, Time.frameCount));
+        m_PredictionRecord.Add(new Record(pos, Time.frameCount, m_Flag));
     }
 
     public void SetPath(Vector3 pos)
@@ -75,7 +84,7 @@ public class Recorder : MonoBehaviour
             m_PathRecord.RemoveAt(0);
         }
 
-        m_PathRecord.Add(new Record(pos, Time.frameCount));
+        m_PathRecord.Add(new Record(pos, Time.frameCount, m_Flag));
     }
 
 
@@ -98,10 +107,10 @@ public class Recorder : MonoBehaviour
         }
 
         if (ShowPrediction)
-        {
-            Gizmos.color = Color.blue;
+        {    
             for (int i = 0; i < m_PredictionRecord.Count; i++)
             {
+                Gizmos.color = m_PredictionRecord[i].Flag == 0 ? Color.blue : new Color(0.1f, 0.4f, 0.9f, 1);
                 Gizmos.DrawSphere(m_PredictionRecord[i].Pos, BaseSphereRadius * 0.5f);
 
                 if (i + 1 < m_PredictionRecord.Count)
@@ -113,9 +122,9 @@ public class Recorder : MonoBehaviour
 
         if (ShowPath)
         {
-            Gizmos.color = Color.green;
             for (int i = 0; i < m_PathRecord.Count; i++)
             {
+                Gizmos.color = m_PathRecord[i].Flag == 0 ? Color.green : new Color(0.6f, 0.9f, 0.2f, 1);
                 Gizmos.DrawSphere(m_PathRecord[i].Pos, BaseSphereRadius * 0.5f);
 
                 if (i + 1 < m_PathRecord.Count)

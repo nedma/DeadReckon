@@ -217,14 +217,17 @@ public class DRHelper
         // BLEND THE TWO - lerp between the last known and blended velocity 
         // ---->Qt = Pt + (Pt' - Pt) * T^
         pos = velBlendedPos + (lastKnownPosChange - velBlendedPos) * smoothingFactor;
+
         // ADD ACCEL - do at end because it applies to both projections anyway.
+        Vector3 accelerationEffect = Vector3.zero;
         if (useAcceleration)
         {
-            pos += ((mAcceleration * 0.5f) * (mElapsedTimeSinceUpdate * mElapsedTimeSinceUpdate));
+            accelerationEffect = ((mAcceleration * 0.5f) * (mElapsedTimeSinceUpdate * mElapsedTimeSinceUpdate));
         }
 
+        pos += accelerationEffect;
 
-        m_Owner.Recorder.SetPrediction(velBlendedPos);
+        m_Owner.Recorder.SetPrediction(lastKnownPosChange + accelerationEffect);
 
         return pos;
     }
@@ -291,13 +294,13 @@ public class DRHelper
 
 
     //////////////////////////////////////////////////////////////////////
-    public void SetLastTranslationUpdatedTime(float newUpdatedTime)
-    {
-        //the average of the last average and the current time since an update.
-        float timeDelta = newUpdatedTime - mLastUpdatedTime;
-        mAvgTimeBetweenUpdates = 0.5f * timeDelta + 0.5f * mAvgTimeBetweenUpdates;
-        mLastUpdatedTime = newUpdatedTime;
-    }
+//     public void SetLastTranslationUpdatedTime(float newUpdatedTime)
+//     {
+//         //the average of the last average and the current time since an update.
+//         float timeDelta = newUpdatedTime - mLastUpdatedTime;
+//         mAvgTimeBetweenUpdates = 0.5f * timeDelta + 0.5f * mAvgTimeBetweenUpdates;
+//         mLastUpdatedTime = newUpdatedTime;
+//     }
 
 
    //////////////////////////////////////////////////////////////////////
