@@ -24,6 +24,7 @@ public class Recorder : MonoBehaviour
 
     public bool ShowPrediction;
     public bool ShowPath;
+    public bool UseWireframe;
 
     public int OldestRecordFrameCount
     {
@@ -103,7 +104,10 @@ public class Recorder : MonoBehaviour
         Gizmos.color = Color.red;
         for (int i = 0; i < m_SnapshotRecord.Count; i++ )
         {
-            Gizmos.DrawSphere(m_SnapshotRecord[i].Pos, BaseSphereRadius);
+            if (UseWireframe && m_SnapshotRecord[i].Flag == 0)
+                Gizmos.DrawWireSphere(m_SnapshotRecord[i].Pos, BaseSphereRadius);
+            else
+                Gizmos.DrawSphere(m_SnapshotRecord[i].Pos, BaseSphereRadius);
         }
 
         if (ShowPrediction)
@@ -111,7 +115,11 @@ public class Recorder : MonoBehaviour
             for (int i = 0; i < m_PredictionRecord.Count; i++)
             {
                 Gizmos.color = m_PredictionRecord[i].Flag == 0 ? Color.blue : new Color(0.1f, 0.4f, 0.9f, 1);
-                Gizmos.DrawSphere(m_PredictionRecord[i].Pos, BaseSphereRadius * 0.5f);
+
+                if (UseWireframe && m_PredictionRecord[i].Flag == 0)
+                    Gizmos.DrawWireSphere(m_PredictionRecord[i].Pos, BaseSphereRadius * 0.5f);
+                else
+                    Gizmos.DrawSphere(m_PredictionRecord[i].Pos, BaseSphereRadius * 0.5f);
 
                 if (i + 1 < m_PredictionRecord.Count)
                 {
@@ -125,7 +133,11 @@ public class Recorder : MonoBehaviour
             for (int i = 0; i < m_PathRecord.Count; i++)
             {
                 Gizmos.color = m_PathRecord[i].Flag == 0 ? Color.green : new Color(0.6f, 0.9f, 0.2f, 1);
-                Gizmos.DrawSphere(m_PathRecord[i].Pos, BaseSphereRadius * 0.5f);
+
+                if (UseWireframe && m_PathRecord[i].Flag == 0)
+                    Gizmos.DrawWireSphere(m_PathRecord[i].Pos, BaseSphereRadius * 0.5f);
+                else
+                    Gizmos.DrawSphere(m_PathRecord[i].Pos, BaseSphereRadius * 0.5f);
 
                 if (i + 1 < m_PathRecord.Count)
                 {
