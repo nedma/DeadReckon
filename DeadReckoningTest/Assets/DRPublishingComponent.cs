@@ -45,8 +45,7 @@ public class DRPublishingComponent : MonoBehaviour
 
     void OnTickRemote()
     {
-        ComputeCurrentVelocity();
-
+        //ComputeCurrentVelocity();
 
 
         float elapsedTime = Time.deltaTime;
@@ -130,16 +129,16 @@ public class DRPublishingComponent : MonoBehaviour
 
     void FixedUpdate()
     {
-        //ComputeCurrentVelocity();
+        ComputeCurrentVelocityBasedOnPhys();
 
         //Debug.LogWarning("fixed update, deltaTime=" + Time.fixedDeltaTime);
     }
 
-    void ComputeCurrentVelocity()
+    void ComputeCurrentVelocityBasedOnPhys()
     {
         mCurrentVelocity = rigidbody.velocity;
         Vector3 changeInVelocity = rigidbody.velocity - mAccumulatedLinearVelocity;
-        mCurrentAcceleration = changeInVelocity / Time.deltaTime;
+        mCurrentAcceleration = changeInVelocity / Time.fixedDeltaTime;
 
 
         mAccumulatedLinearVelocity = rigidbody.velocity;
@@ -147,7 +146,7 @@ public class DRPublishingComponent : MonoBehaviour
         //Debug.LogWarning("mCurrentAcceleration= " + mCurrentAcceleration + ", deltaTime=" + Time.deltaTime + ", time=" + Time.time);
     }
 
-    void ComputeCurrentVelocity_Deprecated(float deltaTime, Vector3 pos)
+    void ComputeCurrentVelocity(float deltaTime, Vector3 pos)
     {
         if (mPrevFrameDeltaTime > 0.0f && mLastPos.sqrMagnitude > 0.0) // ignore first time.
         {
