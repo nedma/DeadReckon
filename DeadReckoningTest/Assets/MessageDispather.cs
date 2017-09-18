@@ -8,6 +8,8 @@ public struct StateMsg
     public Vector3 Pos;
     public Vector3 Vel;
     public Vector3 Acc;
+    public Quaternion Rot;
+    public Vector3 AngVel; // in degrees/sec
 
     public float TimeStamp;
 }
@@ -112,5 +114,7 @@ public class MessageDispather : MonoBehaviour
         Receiver.SetLastKnownTranslation(sMsg.Pos);
         Receiver.SetLastKnownVelocity(sMsg.Vel);
         Receiver.SetLastKnownAcceleration(sMsg.Acc);
+        Receiver.SetLastKnownRotation(sMsg.Rot);
+        Receiver.SetLastKnownAngularVelocity(sMsg.AngVel);
     }
 }

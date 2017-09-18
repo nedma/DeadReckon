@@ -58,13 +58,40 @@ public class DRHelper
     bool mUpdated = false;
 
 
-
-    bool mRotationInitiated;
-    bool mRotationUpdated;
+    public Vector3 mAngularVelocityVector;
+    bool mRotationInitiated = false;
+    bool mRotationUpdated = false;
     // if the rotation has been resolved to the last updated version.
     bool mRotationResolved = true;
+    public bool RotationResolved
+    {
+        set { mRotationResolved = value; }
+    }
 
-    float mCurTimeDelta; // Tracks how long this process step is for. Used to compute instant vel.
+
+    ///the amount of time since this actor started smoothing.
+    float mRotationElapsedTimeSinceUpdate;
+
+    ///the end amount of time to use when smoothing the rotation.  At this point, the blend should be finished.
+    float mRotationEndSmoothingTime;
+
+    ///last known orientation (vector)
+    //Vector3 mLastRotation;
+    ///last known orientation (matrix)
+    //Matrix mLastRotationMatrix;
+    ///last known orientation (quaternion)
+    Quaternion mLastQuatRotation;
+    ///dead reckoned attitude quaternion prior update
+    Quaternion mRotQuatBeforeLastUpdate;
+    ///current dead reckoned attitude quaternion
+    Quaternion mCurrentDeadReckonedRotation;
+    public Quaternion CurrentDeadReckonedRotation
+    {
+        get { return mCurrentDeadReckonedRotation; }
+    }
+
+
+    float mCurTimeDelta = 0.0f; // Tracks how long this process step is for. Used to compute instant vel.
     const float mFixedSmoothingTime = 1.0f;
 
 
@@ -92,8 +119,9 @@ public class DRHelper
         if (IsUpdated() ||
             mLastValue != unclampedTranslation ||
             !mRotationResolved ||
-            mLastVelocity.magnitude > 1e-2f ||
-            (mAcceleration.magnitude > 1e-2f)
+            mLastVelocity.sqrMagnitude > 1e-2f ||
+            mAcceleration.sqrMagnitude > 1e-2f ||
+            mAngularVelocityVector.sqrMagnitude  > 1e-5f
             )
         {
             // if we got an update, then we need to recalculate our smoothing
@@ -103,7 +131,11 @@ public class DRHelper
             }
 
             // RESOLVE ROTATION
-            //DeadReckonTheRotation(xform);
+            Quaternion drRot = Quaternion.identity;
+            if (DeadReckonTheRotation(xform, ref drRot))
+            {
+                xform.Rot = drRot;
+            }
 
             // POSITION SMOOTHING
             Vector3 drPos = DeadReckonThePosition(xform.Pos, useAcceleration, mCurTimeDelta);
@@ -154,6 +186,27 @@ public class DRHelper
         mUpdated = true;
     }
 
+    public void SetLastKnownRotation(Quaternion rot)
+    {
+        if (mRotationInitiated)
+        {
+            mRotQuatBeforeLastUpdate = mCurrentDeadReckonedRotation;
+        }
+        else
+        {
+            //mLastRotationMatrix.get(mRotQuatBeforeLastUpdate);
+            mRotQuatBeforeLastUpdate = rot;
+        }
+
+        mLastQuatRotation = rot;
+        mRotationElapsedTimeSinceUpdate = 0.0f;
+        mRotationInitiated = true;
+        mRotationUpdated = true;
+
+
+        mUpdated = true;
+    }
+
     public void SetLastKnownAcceleration(Vector3 vec)
     {
         mAcceleration = vec;
@@ -195,6 +248,63 @@ public class DRHelper
         return pos;
     }
 
+
+    bool DeadReckonTheRotation(XTransform xform, ref Quaternion newRot)
+    {
+        Quaternion drQuat = mLastQuatRotation; // velocity only just uses the last.
+        bool isRotationChangedByAccel = false;
+        Quaternion startRotation = mRotQuatBeforeLastUpdate;
+
+        if (!mRotationResolved) // mRotationResolved is never set when using Accel
+        {
+
+            // For vel and Accel, we use the angular velocity to compute a dead reckoning matrix to slerp to
+            // assuming that we have an angular velocity at all...
+            if (mAngularVelocityVector.sqrMagnitude > 1e-6)
+            {
+                // if we're here, we had some sort of change, however small
+                isRotationChangedByAccel = true;
+
+                float actualRotationTime = Mathf.Min(mRotationElapsedTimeSinceUpdate, mRotationEndSmoothingTime);
+
+                Vector3 angVelAxis = mAngularVelocityVector.normalized;
+                float angVelMag = mAngularVelocityVector.magnitude;
+
+                // rotation around the axis is magnitude of ang vel * time.
+                float rotationAngle = angVelMag * actualRotationTime;
+                Quaternion rotationFromAngVel = Quaternion.AngleAxis(rotationAngle, angVelAxis);
+
+                // Expected DR'ed rotation - Take the last rot and add the change over time
+                drQuat = rotationFromAngVel * mLastQuatRotation;
+                // Previous DR'ed rotation - same, but uses where we were before the last update, so we can smooth it out...
+                startRotation = rotationFromAngVel * mRotQuatBeforeLastUpdate;
+            }
+
+            // If there is a difference in the rotations and we still have time to smooth, then
+            // slerp between the two quats: 
+            //     1) the old rotation plus the expected change using angular velocity and 
+            //     2) the desired new rotation
+            if ((mRotationEndSmoothingTime > 0.0f) && (mRotationElapsedTimeSinceUpdate < mRotationEndSmoothingTime))
+            {
+                float smoothingFactor = mRotationElapsedTimeSinceUpdate / mRotationEndSmoothingTime;
+                smoothingFactor = Mathf.Clamp01(smoothingFactor);
+                newRot = Quaternion.Slerp(startRotation, drQuat, smoothingFactor);
+            }
+            else // Either smoothing time is done or the current rotation equals the desired rotation
+            {
+                newRot = drQuat;
+                mRotationResolved = !isRotationChangedByAccel; //true;
+            }
+
+            mCurrentDeadReckonedRotation = newRot;
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
 
     Vector3 DeadReckonUsingLinearBlend(Vector3 curPos, bool useAcceleration)
@@ -242,7 +352,7 @@ public class DRHelper
         // ROTATION
         //       if (mUseFixedSmoothingTime)
         //       {
-        //          mRotationEndSmoothingTime = GetFixedSmoothingTime();
+        mRotationEndSmoothingTime = m_Owner.ExtrapolationTime;
         //       }
         //       else 
         //       {
@@ -322,6 +432,15 @@ public class DRHelper
     public float GetTranslationElapsedTimeSinceUpdate()
     { 
         return mElapsedTimeSinceUpdate; 
+    }
+
+    public void SetRotationElapsedTimeSinceUpdate(float value)
+    { 
+        mRotationElapsedTimeSinceUpdate = value; 
+    }
+    public float GetRotationElapsedTimeSinceUpdate()
+    { 
+        return mRotationElapsedTimeSinceUpdate; 
     }
 
 

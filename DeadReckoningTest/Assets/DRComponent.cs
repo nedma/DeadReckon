@@ -51,11 +51,11 @@ public class DRComponent : MonoBehaviour
 
         m_Recorder.SetSnapshot(pos);
     }
-//     public void SetLastKnownRotation(Vector3 pos)
-//     {
-    //         helper.SetLastKnownRotation(pos);
-//         mUpdated = true;
-//     }
+    public void SetLastKnownRotation(Quaternion rot)
+    {
+        helper.SetLastKnownRotation(rot);
+        mUpdated = true;
+    }
 
     public void SetLastKnownVelocity(Vector3 vec)
     {
@@ -69,21 +69,30 @@ public class DRComponent : MonoBehaviour
         mUpdated = true;
     }
 
+    public void SetLastKnownAngularVelocity(Vector3 vec)
+    {
+        helper.mAngularVelocityVector = vec;
+        mUpdated = true;
+    }
 
 
     void TickRemote()
     {
         XTransform xform = new XTransform();
         xform.Pos = helper.CurrentDeadReckonedValue;
-        //xform.Rot = helper.CurrentDeadReckonedRot;
+        xform.Rot = helper.CurrentDeadReckonedRotation;
 
         float simTimeDelta = Time.deltaTime;
         float simTime = Time.time;
 
         if (helper.IsUpdated())
         {
-            //helper.SetLastTranslationUpdatedTime(Time.time);
+            //helper.SetLastTranslationUpdatedTime(simTime);
             helper.SetTranslationElapsedTimeSinceUpdate(0.0f);
+
+            //helper.SetLastRotationUpdatedTime(simTime - simTimeDelta);
+            helper.SetRotationElapsedTimeSinceUpdate(0.0f);
+            helper.RotationResolved = false;
         }
 
 
@@ -93,9 +102,10 @@ public class DRComponent : MonoBehaviour
          if (transElapsedTime < 0.0) 
              transElapsedTime = 0.0f;
          helper.SetTranslationElapsedTimeSinceUpdate(transElapsedTime);
-//          float rotElapsedTime = helper.GetRotationElapsedTimeSinceUpdate() + simTimeDelta;
-//          if (rotElapsedTime < 0.0) rotElapsedTime = 0.0f;
-//          helper.SetRotationElapsedTimeSinceUpdate(rotElapsedTime);
+         float rotElapsedTime = helper.GetRotationElapsedTimeSinceUpdate() + simTimeDelta;
+         if (rotElapsedTime < 0.0) 
+             rotElapsedTime = 0.0f;
+         helper.SetRotationElapsedTimeSinceUpdate(rotElapsedTime);
 
 
          // Actual dead reckoning code moved into the helper..
@@ -127,6 +137,9 @@ public class DRComponent : MonoBehaviour
                  float t = Mathf.Max(Time.deltaTime, 0.01f);
                  rigidbody.velocity = deltaMove / t;
 
+
+                 rigidbody.MoveRotation(xform.Rot);
+
                  m_Recorder.SetPath(xform.Pos);
              }      
              else
@@ -134,6 +147,8 @@ public class DRComponent : MonoBehaviour
                  transform.position = xform.Pos;
                  if (bClampToGround)
                      ClampToGround();
+
+                 transform.rotation = xform.Rot;
 
                  m_Recorder.SetPath(transform.position);
              }

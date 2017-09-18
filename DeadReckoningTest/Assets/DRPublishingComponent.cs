@@ -78,7 +78,7 @@ public class DRPublishingComponent : MonoBehaviour
     {
 
          m_LastStateSended.Pos = pos;
-         //GetDeadReckoningHelper().SetLastKnownRotation(rot);
+         m_LastStateSended.Rot = rot;
 
 
          // Linear Velocity & acceleration - push the current value to the Last Known
@@ -113,15 +113,15 @@ public class DRPublishingComponent : MonoBehaviour
          }
 
          // Angular Velocity - push the current value to the Last Known
-//          if (mPublishAngularVelocity)
-//          {
-//             Vector3 angularVelocity = GetCurrentAngularVelocity();
-//             if (angularVelocity.length() < 0.001)  // If close to 0, set to 0 to prevent wiggling/shaking
-//             {
-//                angularVelocity = osg::Vec3(0.f, 0.f, 0.f);
-//             }
-//             GetDeadReckoningHelper().SetLastKnownAngularVelocity(angularVelocity);
-//          }
+         if (true/*mPublishAngularVelocity*/)
+         {
+            Vector3 angularVelocity = rigidbody.angularVelocity * Mathf.Rad2Deg;
+            if (angularVelocity.magnitude < 0.001)  // If close to 0, set to 0 to prevent wiggling/shaking
+            {
+                angularVelocity = Vector3.zero;
+            }
+            m_LastStateSended.AngVel = angularVelocity;
+         }
 
     }
 
