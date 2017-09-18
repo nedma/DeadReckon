@@ -9,7 +9,7 @@ Properties {
 	_Transparency ("Transparency", Range (0.0, 1.0)) = 1.0
 }
 SubShader {
-	Tags { "RenderType"="Opaque" }
+	Tags { "Queue"="Transparent" "RenderType"="Transparent" }
 	LOD 150
 	//ZWrite Off
 	Blend SrcAlpha OneMinusSrcAlpha
