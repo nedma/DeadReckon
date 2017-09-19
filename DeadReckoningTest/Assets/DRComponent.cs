@@ -2,11 +2,6 @@
 using System.Collections;
 
 
-public struct XTransform
-{
-    public Vector3 Pos;
-    public Quaternion Rot;
-}
 
 public class DRComponent : MonoBehaviour 
 {

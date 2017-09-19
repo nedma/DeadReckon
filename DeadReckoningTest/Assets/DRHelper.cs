@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+public struct XTransform
+{
+    public Vector3 Pos;
+    public Quaternion Rot;
+}
+
+
 public class DRHelper
 {
     DRComponent m_Owner;
@@ -234,7 +242,8 @@ public class DRHelper
             }
             pos = mLastValue + mLastVelocity * mElapsedTimeSinceUpdate + accelerationEffect;
 
-            m_Owner.Recorder.SetPrediction(pos);
+            if (m_Owner.Recorder != null)
+                m_Owner.Recorder.SetPrediction(pos);
         }
         else
         {
@@ -343,7 +352,8 @@ public class DRHelper
 
         pos += accelerationEffect;
 
-        m_Owner.Recorder.SetPrediction(lastKnownPosChange + accelerationEffect);
+        if (m_Owner.Recorder != null)
+            m_Owner.Recorder.SetPrediction(lastKnownPosChange + accelerationEffect);
 
         return pos;
     }
@@ -410,25 +420,25 @@ public class DRHelper
 
 
     //////////////////////////////////////////////////////////////////////
-//     public void SetLastTranslationUpdatedTime(float newUpdatedTime)
-//     {
-//         //the average of the last average and the current time since an update.
-//         float timeDelta = newUpdatedTime - mLastUpdatedTime;
-//         mAvgTimeBetweenUpdates = 0.5f * timeDelta + 0.5f * mAvgTimeBetweenUpdates;
-//         mLastUpdatedTime = newUpdatedTime;
-//     }
+    //     public void SetLastTranslationUpdatedTime(float newUpdatedTime)
+    //     {
+    //         //the average of the last average and the current time since an update.
+    //         float timeDelta = newUpdatedTime - mLastUpdatedTime;
+    //         mAvgTimeBetweenUpdates = 0.5f * timeDelta + 0.5f * mAvgTimeBetweenUpdates;
+    //         mLastUpdatedTime = newUpdatedTime;
+    //     }
 
 
-   //////////////////////////////////////////////////////////////////////
-//    void SetLastRotationUpdatedTime(double newUpdatedTime)
-//    {
-//       //the average of the last average and the current time since an update.
-//       float timeDelta = float(newUpdatedTime - mLastRotationUpdatedTime);
-//       mAverageTimeBetweenRotationUpdates = 0.5f * timeDelta + 0.5f * mAverageTimeBetweenRotationUpdates;
-//       mLastRotationUpdatedTime = newUpdatedTime;
-//    }
+    //////////////////////////////////////////////////////////////////////
+    //    void SetLastRotationUpdatedTime(double newUpdatedTime)
+    //    {
+    //       //the average of the last average and the current time since an update.
+    //       float timeDelta = float(newUpdatedTime - mLastRotationUpdatedTime);
+    //       mAverageTimeBetweenRotationUpdates = 0.5f * timeDelta + 0.5f * mAverageTimeBetweenRotationUpdates;
+    //       mLastRotationUpdatedTime = newUpdatedTime;
+    //    }
 
-   //////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
     public void SetTranslationElapsedTimeSinceUpdate(float value)
     {
         // Compute time delta for this step of DR. Should be the same as DeltaTime in the component
@@ -436,28 +446,28 @@ public class DRHelper
         mElapsedTimeSinceUpdate = value;
     }
     public float GetTranslationElapsedTimeSinceUpdate()
-    { 
-        return mElapsedTimeSinceUpdate; 
+    {
+        return mElapsedTimeSinceUpdate;
     }
 
     public void SetRotationElapsedTimeSinceUpdate(float value)
-    { 
-        mRotationElapsedTimeSinceUpdate = value; 
+    {
+        mRotationElapsedTimeSinceUpdate = value;
     }
     public float GetRotationElapsedTimeSinceUpdate()
-    { 
-        return mRotationElapsedTimeSinceUpdate; 
+    {
+        return mRotationElapsedTimeSinceUpdate;
     }
 
 
-   public void ClearUpdated() 
-   {
-       mUpdated = false; 
-       mRotationUpdated = false; 
-   }
+    public void ClearUpdated()
+    {
+        mUpdated = false;
+        mRotationUpdated = false;
+    }
 
     public bool IsUpdated()
-    { 
-        return mUpdated; 
+    {
+        return mUpdated;
     }
 }
